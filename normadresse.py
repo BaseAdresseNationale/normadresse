@@ -21,6 +21,7 @@ def abrev_out(orig, lib, max_out):
     # élimination des résidus de mots multiples abrégé, ex: ROND POINT > RPT
     for m in range(len(court)-1,0,-1):
         if court[m] == '@':
+            long[m-1] = court[m-1]
             del long[m]
             del court[m]
 
@@ -81,10 +82,22 @@ def abrev(lib, maxi=32, debug=False):
         for r in regles:
             if r['etape']==5:
                 lib = re.sub(" "+r['long'].strip()+" "," "+r['court'].strip().lower()+" ",lib, count=1)
-                lib = re.sub("^"+r['long'].strip()+" ",r['court'].strip().lower()+" ",lib, count=1)
         for r in regles:
             if r['etape']==1:
                 lib = re.sub(" "+r['long'].strip()+" "," "+r['court'].strip().lower()+" ",lib, count=1)
+    if debug:
+        print('5:',lib)
+
+    out,ok = abrev_out(orig, lib, maxi)
+    if ok:
+        return(out)
+
+    for n in range(0,2):
+        for r in regles:
+            if r['etape']==5:
+                lib = re.sub("^"+r['long'].strip()+" ",r['court'].strip().lower()+" ",lib, count=1)
+        for r in regles:
+            if r['etape']==1:
                 lib = re.sub("^"+r['long'].strip()+" ",r['court'].strip().lower()+" ",lib, count=1)
     if debug:
         print('5:',lib)
