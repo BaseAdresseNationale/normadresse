@@ -37,13 +37,11 @@ def abrev_out(orig, lib, max_out):
 
 def abrev(lib, maxi=32):
     "abrège un libellé avec une longueur maximale (32 par défaut)"
-    orig = lib # on conserve le libellé original
     # suppression des accent et traits d'union
     lib = unidecode(lib).upper()
     # on ne garde que lettres et chiffres
     lib = re.sub(r'[^A-Z0-9]',' ',lib).replace('  ',' ')
-    if debug:
-        print(lib)
+    orig = lib # on conserve le libellé original avant abréviation
 
     # soyons optimistes !
     if len(lib)<=maxi:
