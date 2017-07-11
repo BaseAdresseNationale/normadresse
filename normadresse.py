@@ -13,6 +13,7 @@ with open('normadresse.csv') as abbrev_csv:
         row['etape'] = float(row['etape'])
         regles.append(row)
 
+debug = False
 
 def abrev_out(orig, lib, max_out):
     "sélectionne les mots courts dans l'ordre de gauche à droite"
@@ -24,6 +25,8 @@ def abrev_out(orig, lib, max_out):
             long[m-1] = court[m-1]
             del long[m]
             del court[m]
+            if debug:
+                print(long,court)
 
     for m in range(1,len(court)):
         out = (" ".join(court[0:m])+" "+" ".join(long[m:])).strip()
@@ -32,13 +35,15 @@ def abrev_out(orig, lib, max_out):
     return(out,len(out)<=max_out)
 
 
-def abrev(lib, maxi=32, debug=False):
+def abrev(lib, maxi=32):
     "abrège un libellé avec une longueur maximale (32 par défaut)"
     orig = lib # on conserve le libellé original
     # suppression des accent et traits d'union
     lib = unidecode(lib).upper()
     # on ne garde que lettres et chiffres
     lib = re.sub(r'[^A-Z0-9]',' ',lib).replace('  ',' ')
+    if debug:
+        print(lib)
 
     # soyons optimistes !
     if len(lib)<=maxi:
@@ -215,4 +220,5 @@ if __name__ == "__main__":
             if n>0:
                 print(n)
         else:
-            print(abrev(sys.argv[1].upper(),debug=(sys.argv[1] != sys.argv[1].upper())).upper())
+            debug=(sys.argv[1] != sys.argv[1].upper())
+            print(abrev(sys.argv[1].upper()).upper())
