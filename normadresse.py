@@ -31,8 +31,8 @@ def abrev_out(orig, lib, max_out):
     for m in range(1,len(court)):
         out = (" ".join(court[0:m])+" "+" ".join(long[m:])).strip()
         if (len(out)<=max_out):
-            return(out,True)
-    return(out,len(out)<=max_out)
+            return(out,True,lib.replace(' @',''))
+    return(out,len(out)<=max_out,lib.replace(' @',''))
 
 
 def abrev(lib, maxi=32):
@@ -52,9 +52,11 @@ def abrev(lib, maxi=32):
         if r['etape']==1:
             lib = re.sub('^'+r['long'],r['court'],lib, count=1)
 
-    out,ok = abrev_out(orig, lib, maxi)
+    out,ok,prev = abrev_out(orig, lib, maxi)
     if ok:
         return(out)
+    else:
+        lib = prev
 
     # 2 - abréviation des titres militaires, religieux et civils
     for n in range(0,2):
@@ -64,21 +66,25 @@ def abrev(lib, maxi=32):
     if debug:
         print('2:',lib)
 
-    out,ok = abrev_out(orig, lib, maxi)
+    out,ok,prev = abrev_out(prev, lib, maxi)
     if ok:
         return(out)
+    else:
+        lib = prev
 
     # 4 - abréviations générales
     for n in range(0,3):
         for r in regles:
             if r['etape']==4:
-                lib = re.sub(" "+r['long']+" "," "+r['court'].lower()+" ",lib, count=1)
+                lib = re.sub("(^| )"+r['long']+" "," "+r['court'].lower()+" ",lib, count=1).strip()
     if debug:
         print('4:',lib)
 
-    out,ok = abrev_out(orig, lib, maxi)
+    out,ok,prev = abrev_out(prev, lib, maxi)
     if ok:
         return(out)
+    else:
+        lib = prev
 
     # 5 - abréviation type de voies
     for n in range(0,2):
@@ -91,23 +97,11 @@ def abrev(lib, maxi=32):
     if debug:
         print('5:',lib)
 
-    out,ok = abrev_out(orig, lib, maxi)
+    out,ok,prev = abrev_out(prev, lib, maxi)
     if ok:
         return(out)
-
-    for n in range(0,2):
-        for r in regles:
-            if r['etape']==5:
-                lib = re.sub("^"+r['long'].strip()+" ",r['court'].strip().lower()+" ",lib, count=1)
-        for r in regles:
-            if r['etape']==1:
-                lib = re.sub("^"+r['long'].strip()+" ",r['court'].strip().lower()+" ",lib, count=1)
-    if debug:
-        print('5:',lib)
-
-    out,ok = abrev_out(orig, lib, maxi)
-    if ok:
-        return(out)
+    else:
+        lib = prev
 
     # 3 - abréviations prénoms sauf pour ST prénoms
     mots = lib.split()
@@ -123,9 +117,11 @@ def abrev(lib, maxi=32):
                         if debug:
                             print('3:',lib)
 
-    out,ok = abrev_out(orig, lib, maxi)
+    out,ok,prev = abrev_out(prev, lib, maxi)
     if ok:
         return(out)
+    else:
+        lib = prev
 
 
     # 5bis - abréviation type de voies
@@ -141,15 +137,30 @@ def abrev(lib, maxi=32):
     #             return lib
 
     # 6 - abréviation saint/sainte et prolonge(e)/inférieur(e)
-    for r in regles:
-        if r['etape']==6:
-            lib = re.sub(r['long'],r['court'].lower(),lib, count=1)
+    for n in range(0,2):
+        for r in regles:
+            if r['etape']==6:
+                lib = re.sub(r['long'],r['court'].lower(),lib, count=1)
     if debug:
         print('6:',lib)
 
-    out,ok = abrev_out(orig, lib, maxi)
+    out,ok,prev = abrev_out(prev, lib, maxi)
     if ok:
         return(out)
+    else:
+        lib = prev
+
+    # 5bis - type de voie en début...
+    for n in range(0,1):
+        for r in regles:
+            if r['etape']==5:
+                lib = re.sub("^"+r['long'].strip()+" ",r['court'].strip().lower()+" ",lib, count=1)
+    out,ok,prev = abrev_out(prev, lib, maxi)
+    if ok:
+        return(out)
+    else:
+        lib = prev
+
 
     lib = lib.replace(' @','')
 
@@ -162,7 +173,7 @@ def abrev(lib, maxi=32):
         print('9:',lib)
 
     # 10 - élimination des articles
-    for r in range(0,4):
+    for r in range(0,6):
         lib = re.sub(r" (LE|LA|LES|AU|AUX|DE|DU|DES|D|ET|A|L|SUR|EN) "," ",lib, count=1)
         if len(lib)<=maxi:
             return lib
