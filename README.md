@@ -17,7 +17,7 @@ cat libelles.txt | python normadresse.py
 ```
 ### Comme module python:
 ```
-import normadresse
+from normadresse import abrev
 
 print(abrev('BOULEVARD DU MARECHAL JEAN MARIE DE LATTRE DE TASSIGNY'))
 
