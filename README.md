@@ -33,3 +33,7 @@ Il est possible de modifier la longueur maximale (32 caractères par défaut) po
 Une série d'expressions régulières est appliquée pour chaque étape d'abréviation. Ces regex sont stockées dans un fichier CSV, **leur ordre est important**.
 
 A chaque étape, les mots abrégés sont pris de gauche à droite et dès que la longueur maximale n'est pas dépassée le résultat est envoyé.
+
+## Voir aussi
+
+- [go-normadresse](https://github.com/united-drivers/go-normadresse) - Portage en Golang de ce module
