@@ -1,0 +1,78 @@
+version: 2
+
+defaults:
+  workspace_root: &workspace_root
+    ~/normadresse
+
+  python3_container: &python3_container
+    working_directory: *workspace_root
+    docker:
+      - image: circleci/python:3.6
+
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
+
+  restore_virtualenv: &restore_virtualenv
+    restore_cache:
+      name: Restore virtualenv cache
+      keys:
+        - v1-normadresse-pip-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
+
+jobs:
+  checkout:
+    <<: *python3_container
+    steps:
+      - checkout
+
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - ./
+
+  install:
+    <<: *python3_container
+    steps:
+      - *attach_workspace
+      - *restore_virtualenv
+
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r requirements-dev.txt
+
+      - save_cache:
+          name: Save virtualenv cache
+          key: v1-normadresse-pip-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
+          paths:
+            - venv/
+
+  test:
+    <<: *python3_container
+    steps:
+      - *attach_workspace
+      - *restore_virtualenv
+
+      - run:
+          name: Run tests
+          command: |
+            . venv/bin/activate
+            pytest tests.py
+
+workflows:
+  version: 2
+
+  run-tests:
+    jobs:
+      - checkout
+
+      - install:
+          requires:
+            - checkout
+
+      - test:
+          requires:
+            - install
