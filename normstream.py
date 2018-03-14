@@ -5,7 +5,7 @@ from normadresse import abrev
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("""Usage:  normstream.py
-        cat fichier.csv | python normadresse.py colonne_nom colonne_norm > out.csv""")  # noqa
+        cat test.csv | python normadresse.py nom nom_afnor""")  # noqa
     else:
         input = csv.DictReader(sys.stdin)
         output = csv.DictWriter(sys.stdout, input.fieldnames)
